@@ -17,7 +17,6 @@ namespace JustForFun
         private const string SOURCE_PATH_CONF_KEY = "SourcePath";
         private const string DESTINATION_PATH_CONF_KEY = "DestinationPath";
         private const string ACCEPTED_SIZES_CONF_KEY = "AcceptedSizes";
-        private const string VALIDATE_SIZES_CONF_KEY = "ValidateSizes";
 
         #endregion
 
@@ -42,17 +41,6 @@ namespace JustForFun
             get
             {
                 return Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings[DESTINATION_PATH_CONF_KEY]);
-            }
-        }
-
-        /// <summary>
-        /// Destination Path
-        /// </summary>
-        private static string ValidateSizes
-        {
-            get
-            {
-                return Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings[VALIDATE_SIZES_CONF_KEY]);
             }
         }
 
@@ -109,30 +97,8 @@ namespace JustForFun
                 {
                     using (Image img = Image.FromFile(filePath))
                     {
-                        if (ValidateSizes.ToString().ToLower() == "true")
-                        {
-                            //Si es un archivo de imagen válido, y cumple el tamaño aceptado, continuamos
-                            if (AcceptedSizes.Contains(img.Size))
-                            {
-                                string hash = GetMD5Hash(filePath);
-
-                                if (!fileHashes.ContainsKey(hash))
-                                {
-                                    string pathArchivoDestino = Path.Combine(DestinationPath, DateTime.Now.ToString("yyyyMMddhhmmssfff") + ".jpg");
-                                    File.Copy(filePath, pathArchivoDestino);
-                                    Console.WriteLine("OK: Archivo copiado como {0}", pathArchivoDestino);
-                                }
-                                else
-                                {
-                                    Console.WriteLine("KO: Ya existe un archivo en el destino con hash {0}", hash);
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("KO: Imagen rechazada por su tamaño ({0}x{1})", img.Width, img.Height);
-                            }
-                        }
-                        else
+                        //Si es un archivo de imagen válido, y cumple el tamaño aceptado, continuamos
+                        if (AcceptedSizes.Contains(img.Size))
                         {
                             string hash = GetMD5Hash(filePath);
 
@@ -146,6 +112,10 @@ namespace JustForFun
                             {
                                 Console.WriteLine("KO: Ya existe un archivo en el destino con hash {0}", hash);
                             }
+                        }
+                        else
+                        {
+                            Console.WriteLine("KO: Imagen rechazada por su tamaño ({0}x{1})", img.Width, img.Height);
                         }
                     }
                 }
